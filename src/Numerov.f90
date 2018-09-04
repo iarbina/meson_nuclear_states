@@ -110,9 +110,9 @@ contains
         complex(dp), dimension(int(Nend*xturn/dx)+1) :: CWf_r
 
 
-        open(99, action = 'write', file = "wf2.dat")
-        open(98, action = 'write', file = "lwf.dat")
-        open(97, action = 'write', file = "rwf.dat")
+        open(99, action = 'write', file = "viz/wf2.dat")
+        open(98, action = 'write', file = "viz/lwf.dat")
+        open(97, action = 'write', file = "viz/rwf.dat")
 
         BE  = cmplx(Ereal, Eimag)
 

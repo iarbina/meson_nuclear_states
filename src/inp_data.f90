@@ -33,7 +33,7 @@ contains
     !----------------------------------------------------------------------
     subroutine read_nuclei_data ()
 
-        open(11, status = 'old', action = 'read', file = 'input.inp')
+        open(11, status = 'old', action = 'read', file = 'inp/input.inp')
 
         read(11,*) Z, A, Rn, a0, pqn, aqn
 
@@ -57,7 +57,7 @@ contains
         allocate(VReal(vpot_fdim))
         allocate(VImag(vpot_fdim))
 
-        open(12, status = 'old', action = 'read', file = 'vpot.pika')
+        open(12, status = 'old', action = 'read', file = 'inp/vpot.pika')
 
         ! it is spected to have heading (otherwise comment next line)
         read(12,*) 
@@ -86,7 +86,7 @@ contains
         allocate(tnr(scat_fdim))
         allocate(tni(scat_fdim))
 
-        open(13, status = 'old', action = 'read', file = 'amplKN10.dat')
+        open(13, status = 'old', action = 'read', file = 'inp/amplKN10.dat')
 
         ! it is spected to have heading (otherwise comment next line)
         read(13,*) 

@@ -6,8 +6,8 @@ SRC=src
 OBJ=obj
 OBJECTS=inp_data.o spls3.o potentials.o Numerov.o nuc-modular.o
 
-exeprog: ${OBJECTS}
-	${FC} -o exeprog $(addprefix ${OBJ}/, ${OBJECTS})
+exeprog.exe: ${OBJECTS}
+	${FC} -o exeprog.exe $(addprefix ${OBJ}/, ${OBJECTS})
 
 inp_data.o: ${SRC}/inp_data.f90
 	${FC} -J${OBJ} -c ${SRC}/inp_data.f90 -o ${OBJ}/inp_data.o
@@ -25,4 +25,4 @@ nuc-modular.o: ${SRC}/nuc-modular.f90
 	${FC} -I${OBJ} -c ${SRC}/nuc-modular.f90 -o ${OBJ}/nuc-modular.o
 
 clean:
-	rm -f exeprog ${OBJ}/*.mod ${OBJ}/*.o
+	rm -f exeprog.exe ${OBJ}/*.mod ${OBJ}/*.o

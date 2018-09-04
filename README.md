@@ -1,12 +1,12 @@
 # meson_nuclear_states
 
-Description:
+ Description:
     This program solves Klein-Gordon equation describing 
     the bound or quasi-bound states of meson particles
     whitin the nucleus. For that, it integrates different
     types of nuclear potentials (optical potentials-like).
 
-Conent:
+ Conent:
     /src/ directory contains the source files:
         - inp_data.f90 (module): contains global parameters
           and physical constants. Some of the parameters are

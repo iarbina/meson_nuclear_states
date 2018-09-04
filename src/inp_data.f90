@@ -86,7 +86,7 @@ contains
         allocate(tnr(scat_fdim))
         allocate(tni(scat_fdim))
 
-        open(13, status = 'old', action = 'read', file = 'inp/amplKN10.dat')
+        open(13, status = 'old', action = 'read', file = 'inp/amplKN10.inp')
 
         ! it is spected to have heading (otherwise comment next line)
         read(13,*) 

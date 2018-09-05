@@ -1,5 +1,6 @@
 subroutine Numerov (part_charge, pot_type, BE_out)
 
+    use ansi_colors
     use inp_data
     use potentials
 
@@ -227,7 +228,7 @@ contains
         ! derivatives difference
         G = dx/abs(dur/ynew - dul/ymatch) 
 
-        PRINT *, BE, G
+        !PRINT *, BE, G
         return
     end function G
 
@@ -272,7 +273,7 @@ contains
         else if (pot_type == 6) then
             SE = 0.0_dp
         else
-            print *, "ERROR: Potential type not defined"
+            print *, color("ERROR: Potential type not defined", c_red)
             stop
         end if
 
@@ -281,7 +282,7 @@ contains
         else if (part_charge == 2) then
             g = (mu-BE)**2-mu**2-SE-aqn*(aqn+1.0_dp)/(x/hbarc)**2
         else
-            print *, "ERROR: Particle charge not defined"
+            print *, color("ERROR: Particle charge not defined", c_red)
             stop
         end if
 

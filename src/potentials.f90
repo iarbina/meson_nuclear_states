@@ -1,5 +1,6 @@
 module potentials
 
+    use ansi_colors
     use inp_data
 
     implicit none
@@ -166,7 +167,7 @@ contains
         else if (part_charge == 2) then
             wh  = hmass - Bh
         else
-            PRINT *, "ERROR at SelfEnergy: particle charge note defined"
+            PRINT *, color("ERROR at SelfEnergy: particle charge note defined", c_red)
             STOP
         end if
 
@@ -181,7 +182,7 @@ contains
         else if (pot_type == 5) then
             SelfEnergy = -4._dp*pi*sqrts_out*FhN*dens*hbarc**2/nmass
         else
-            PRINT *, "ERROR at SelfEnergy: potential type not defined"
+            PRINT *, color("ERROR at SelfEnergy: potential type not defined", c_red)
             STOP
         end if
 
@@ -189,7 +190,7 @@ contains
         deallocate(Q)
         deallocate(AU)
 
-        PRINT *, "Calculated sqrts value =", sqrts_out
+        !PRINT *, "Calculated sqrts value =", sqrts_out
 
         return
     contains
@@ -226,7 +227,7 @@ contains
                 else if (ffunc > 0) then
                     xa = xt
                 else
-                    print *, "ERROR at 'Regula Falsi' subroutine: function not greater nor smaller than 0"
+                    print *, color("ERROR at 'Regula Falsi' subroutine: function not greater nor smaller than 0", c_red)
                 end if
                 !print *, func(xt), xt
                 !if (func(xt) == 0._dp) STOP
@@ -273,7 +274,7 @@ contains
                 else if (ffunc > 0) then
                     xa = xt
                 else
-                    print *, "ERROR at Bisection subroutine:function not greater nor smaller than 0"
+                    print *, color("ERROR at Bisection subroutine:function not greater nor smaller than 0", c_red)
                     STOP
                 end if
                 !if (xt == xa .or. xt == xb) then

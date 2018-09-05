@@ -6,10 +6,13 @@ SRC=src
 OBJ=obj
 BIN=bin
 
-OBJECTS=inp_data.o spls3.o potentials.o Numerov.o nuc-modular.o
+OBJECTS=ansi_colors.o inp_data.o spls3.o potentials.o Numerov.o nuc-modular.o
 
 exeprog.exe: ${OBJECTS}
 	${FC} -o ${BIN}/exeprog.exe $(addprefix ${OBJ}/, ${OBJECTS})
+
+ansi_colors.o: ${SRC}/ansi_colors.f90
+	${FC} -J${OBJ} -c ${SRC}/ansi_colors.f90 -o ${OBJ}/ansi_colors.o
 
 inp_data.o: ${SRC}/inp_data.f90
 	${FC} -J${OBJ} -c ${SRC}/inp_data.f90 -o ${OBJ}/inp_data.o

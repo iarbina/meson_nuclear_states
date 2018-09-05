@@ -56,14 +56,16 @@ program nuc_klein_gordon
     print *, " 1. Phenomenological"
     print *, " 2. Phenomenological density dependent"
     print *, " 3. Chiral theory based"
-    print *, " 4. Scattering amplitude based"
-    print *, " 5. No nuclear potential"
+    print *, " 4. Scattering amplitude based (A.R.)"
+    print *, " 5. Scattering amplitude based (Mares et.al.)"
+    print *, " 6. No nuclear potential"
     read(*,*,err = 73) pot_type 
     
     ! if the input is not correct ask another time
     if (pot_type /= 1.and.pot_type /= 2&
-        &.and.pot_type /= 3.and.pot_type /= 4.and.pot_type /= 5) then
-        print *, "You shall choose between 1, 2, 3, 4 or 5!"
+        &.and.pot_type /= 3.and.pot_type /= 4&
+        &.and.pot_type /= 5.and. pot_type /= 6) then
+        print *, "You shall choose between 1, 2, 3, 4, 5 or 6!"
         call sleep(2)
         go to 73
     end if

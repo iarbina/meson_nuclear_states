@@ -266,8 +266,10 @@ contains
         else if (pot_type == 3) then
             SE = 2.0_dp*mu*ChVopt(x, dens)
         else if (pot_type == 4) then
-            SE = SelfEnergy(x, dens, BE)
+            SE = SelfEnergy(x, dens, BE, part_charge, pot_type)
         else if (pot_type == 5) then
+            SE = SelfEnergy(x, dens, BE, part_charge, pot_type)
+        else if (pot_type == 6) then
             SE = 0.0_dp
         else
             print *, "ERROR: Potential type not defined"

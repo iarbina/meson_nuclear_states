@@ -132,14 +132,15 @@ contains
     !----------------------------------------------------------------------
     !  Scattering amplitude based Self-Energy (SE)
     !----------------------------------------------------------------------
-    complex(dp) function SelfEnergy(x, dens, Bh)
+    complex(dp) function SelfEnergy(x, dens, Bh, part_charge, pot_type)
 
         ! external variables
         complex(dp), intent(in) :: Bh
         real(dp),    intent(in) :: x, dens
+        integer,     intent(in) :: part_charge, pot_type
 
         ! internal variables
-        complex(dp) :: wh, tp, tn, ThN, Vh
+        complex(dp) :: wh, tp, tn, ThN, FhN, Vh
         real(dp), parameter :: Bn = 8.5_dp
         real(dp) :: xih, xin, Eth
         real(dp) :: sqrts_a, sqrts_b, sqrts_out
@@ -160,7 +161,14 @@ contains
         xih = hmass/(nmass + hmass)
         xin = nmass/(nmass + hmass)
         Eth = hmass + nmass
-        wh  = hmass - Bh - Vc(x)
+        if (part_charge == 1) then
+            wh  = hmass - Bh - Vc(x)
+        else if (part_charge == 2) then
+            wh  = hmass - Bh
+        else
+            PRINT *, "ERROR at SelfEnergy: particle charge note defined"
+            STOP
+        end if
 
         sqrts_a = fsqrts(1)
         sqrts_b = fsqrts(sdim)
@@ -168,7 +176,14 @@ contains
         !call regula_falsi (sqrts_a, sqrts_b, sqrts_out)
         call bisection (sqrts_a, sqrts_b, sqrts_out)
 
-        SelfEnergy = ThN*dens*hbarc**3
+        if (pot_type == 4) then
+            SelfEnergy = ThN*dens*hbarc**3
+        else if (pot_type == 5) then
+            SelfEnergy = -4._dp*pi*sqrts_out*FhN*dens*hbarc**2/nmass
+        else
+            PRINT *, "ERROR at SelfEnergy: potential type not defined"
+            STOP
+        end if
 
         ! deallocate variables
         deallocate(Q)
@@ -211,7 +226,7 @@ contains
                 else if (ffunc > 0) then
                     xa = xt
                 else
-                    print *, "Error: Bisection subroutine - function not greater nor smaller than 0"
+                    print *, "ERROR at 'Regula Falsi' subroutine: function not greater nor smaller than 0"
                 end if
                 !print *, func(xt), xt
                 !if (func(xt) == 0._dp) STOP
@@ -258,7 +273,7 @@ contains
                 else if (ffunc > 0) then
                     xa = xt
                 else
-                    print *, "Error: Bisection subroutine - function not greater nor smaller than 0"
+                    print *, "ERROR at Bisection subroutine:function not greater nor smaller than 0"
                     STOP
                 end if
                 !if (xt == xa .or. xt == xb) then
@@ -289,11 +304,23 @@ contains
             call SPLS3 (fsqrts,tnr,sdim,sqrts1,Itnr,1,Q,AU,1,0)
             call SPLS3 (fsqrts,tni,sdim,sqrts1,Itni,1,Q,AU,1,0)
 
-            tp = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
-            tn = cmplx(Itnr,Itni)               ! neutron scattering amplitude
-            ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
+            if (part_charge == 1) then
+                tp = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
+                tn = cmplx(Itnr,Itni)               ! neutron scattering amplitude
+                ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
+            else if (part_charge == 2) then
+                tn = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
+                tp = cmplx(Itnr,Itni)               ! neutron scattering amplitude
+                ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
+            end if
+
             Vh = (1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
-            sqrts2 = Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+            
+            if (part_charge == 1) then
+                sqrts2 = Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+            else if (part_charge == 2) then
+                sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+            end if
             func = sqrts1 - sqrts2
 
             return

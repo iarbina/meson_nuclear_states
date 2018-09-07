@@ -1,5 +1,5 @@
 # meson_nuclear_states
-# just a slight mod to be rm
+ 
  Description:
     This program solves Klein-Gordon equation describing 
     the bound or quasi-bound states of meson particles

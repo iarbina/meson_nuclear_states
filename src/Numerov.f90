@@ -228,7 +228,7 @@ contains
         ! derivatives difference
         G = dx/abs(dur/ynew - dul/ymatch) 
 
-        !PRINT *, BE, G
+        PRINT *, BE, G
         return
     end function G
 

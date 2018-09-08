@@ -173,9 +173,10 @@ contains
 
         sqrts_a = fsqrts(1)
         sqrts_b = fsqrts(sdim)
-
+        
         !call regula_falsi (sqrts_a, sqrts_b, sqrts_out)
         call bisection (sqrts_a, sqrts_b, sqrts_out)
+        !sqrts_out = random_guess()
 
         if (pot_type == 4) then
             SelfEnergy = ThN*dens*hbarc**3
@@ -194,6 +195,66 @@ contains
 
         return
     contains
+
+        real(dp) function random_guess() result (sqrts1)
+
+            ! external variables
+
+            ! internal variables
+            real(dp) :: sqrts2
+            real(dp), parameter :: epsi = 1.E-2_dp
+            real(dp), parameter :: Dsqrts = 1.E-2_dp
+            integer :: counter
+
+            sqrts1 = 1.0E2_dp
+            sqrts2 = 0._dp
+
+            do while (abs(sqrts1 - sqrts2) > 0._dp)
+                
+                counter = counter + 1
+                sqrts1 = sqrts1 + Dsqrts
+
+                if (sqrts1 > fsqrts(sdim)) then
+                    Itpr = tpr(sdim)
+                    Itpi = tpi(sdim)
+                    Itnr = tnr(sdim)
+                    Itni = tni(sdim)
+                else if (sqrts1 < fsqrts(1)) then
+                    Itpr = tpr(1)
+                    Itpi = tpi(1)
+                    Itnr = tnr(1)
+                    Itni = tni(1)
+                else
+                    ! interpolation of the scattering amplitude for a given sqrt(s) (cm energy)
+                    call SPLS3 (fsqrts,tpr,sdim,sqrts1,Itpr,1,Q,AU,1,0)
+                    call SPLS3 (fsqrts,tpi,sdim,sqrts1,Itpi,1,Q,AU,1,0)
+                    call SPLS3 (fsqrts,tnr,sdim,sqrts1,Itnr,1,Q,AU,1,0)
+                    call SPLS3 (fsqrts,tni,sdim,sqrts1,Itni,1,Q,AU,1,0)
+                end if
+
+                if (part_charge == 1) then
+                    tp = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
+                    tn = cmplx(Itnr,Itni)               ! neutron scattering amplitude
+                    ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
+                else if (part_charge == 2) then
+                    tn = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
+                    tp = cmplx(Itnr,Itni)               ! neutron scattering amplitude
+                    ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
+                end if
+
+                Vh = 0.5_dp*(1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
+            
+                if (part_charge == 1) then
+                    sqrts2 = Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                else if (part_charge == 2) then
+                    sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                end if
+                
+                PRINT *, "Loop", counter, sqrts1, sqrts2, abs(sqrts1 - sqrts2)
+                if (sqrts2 < 0._dp) STOP
+            end do
+
+        end function random_guess
 
         subroutine regula_falsi (xa_in, xb_in, xt)
 
@@ -267,8 +328,9 @@ contains
 
             ! Bisection method to get sqrts
             xt = 0.5_dp*(xa + xb)
-            do while (abs(xa -xb) > epsi*xt)
-                ffunc = func(xa) * xa
+ !           PRINT *, "***", xa, func(xa), xb, func(xb)
+            do while (abs(xa - xb) > epsi*xt)
+                ffunc = func(xa) * func(xt)
                 if (ffunc < 0) then
                     xb = xt
                 else if (ffunc > 0) then
@@ -282,6 +344,7 @@ contains
                 !    go to 739
                 !end if
                 xt = 0.5_dp*(xa + xb)
+!                PRINT *, "***", xa, func(xa), xb, func(xb)
             end do
 739         continue
 
@@ -315,7 +378,7 @@ contains
                 ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
             end if
 
-            Vh = (1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
+            Vh = 0.5_dp*(1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
             
             if (part_charge == 1) then
                 sqrts2 = Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
@@ -323,7 +386,7 @@ contains
                 sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
             end if
             func = sqrts1 - sqrts2
-
+            !PRINT *, "SQRTS", sqrts1, sqrts2
             return
         end function func
 

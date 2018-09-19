@@ -90,14 +90,8 @@ def main():
 	hmass = 493.70   # Mass of the hadron (in this case the kaon)
 	nmass = 939.0    # Average nucleon mass
 	mu = hmass*nmass*A/(hmass+nmass*A) # Reduced mass
-	dx = 1e-2
-
 	Eth = hmass + nmass
-	Bn  = 8.5
-	Bh  = 10.0
-	xin = nmass / Eth
-	xih = hmass / Eth
-
+	dx = 1e-2
    	
    	def DenSuma():
    		suma = 0.0
@@ -121,24 +115,7 @@ def main():
 		elif (A > 16):
 			Density = rho0/(1.0+np.exp((x-Rn)/a0))
 		return Density
-  
-   	def Vc(x):
-   		if (x.any() <= Rn):
-			Vc = -0.50*Z*hbarc*(3.0-(x/Rn)**2)/(Rn*137.0359991)
-		else:
-			Vc = -Z*hbarc/(x*137.0359991)
-		return Vc
-
-	def tKN(tpr, tpi, tnr, tni):
-		return 0.5 * complex(tpr + tnr, tpi + tni)
-	
-	wh  = hmass - Bh - Vc(x)
-
-	def Vh(x, dens):
-		return 0.5*(1.0 + nmass/wh)*ThN*dens*hbarc**3/sqrts1 
-
-	def sqrts(x, dens):
-		return Eth - Bn - xin*(Bh+Vc(x)) - 15.1*(dens/rhoc)**(2./3) + xih*Vh.real
+   	
 
 #----------------------------------------------------------------------
 	# Plot 1	

@@ -175,8 +175,8 @@ contains
         sqrts_b = fsqrts(sdim)
         
         !call regula_falsi (sqrts_a, sqrts_b, sqrts_out)
-        call bisection (sqrts_a, sqrts_b, sqrts_out)
-        !sqrts_out = random_guess()
+        !call bisection (sqrts_a, sqrts_b, sqrts_out)
+        sqrts_out = random_guess()
 
         if (pot_type == 4) then
             SelfEnergy = ThN*dens*hbarc**3
@@ -253,6 +253,9 @@ contains
                 PRINT *, "Loop", counter, sqrts1, sqrts2, abs(sqrts1 - sqrts2)
                 if (sqrts2 < 0._dp) STOP
             end do
+
+            PRINT *, "OUT OF THE LOOP!"
+            STOP
 
         end function random_guess
 

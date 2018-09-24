@@ -175,8 +175,8 @@ contains
         sqrts_b = fsqrts(sdim)
         
         !call regula_falsi (sqrts_a, sqrts_b, sqrts_out)
-        !call bisection (sqrts_a, sqrts_b, sqrts_out)
-        sqrts_out = random_guess()
+        call bisection (sqrts_a, sqrts_b, sqrts_out)
+        !sqrts_out = random_guess()
 
         if (pot_type == 4) then
             SelfEnergy = ThN*dens*hbarc**3
@@ -191,7 +191,7 @@ contains
         deallocate(Q)
         deallocate(AU)
 
-        !PRINT *, "Calculated sqrts value =", sqrts_out
+        PRINT *, "Calculated sqrts value =", sqrts_out
 
         return
     contains
@@ -203,17 +203,20 @@ contains
             ! internal variables
             real(dp) :: sqrts2
             real(dp), parameter :: epsi = 1.E-2_dp
-            real(dp), parameter :: Dsqrts = 1.E-2_dp
+            real(dp), parameter :: Dsqrts = 1.E-6_dp
             integer :: counter
 
-            sqrts1 = 1.0E2_dp
+            sqrts1 = fsqrts(1)
             sqrts2 = 0._dp
 
-            do while (abs(sqrts1 - sqrts2) > 0._dp)
+            open(33, status = 'replace', action = 'write', file = 'out/kk.out')
+
+            do while (abs(sqrts1 - sqrts2) > 1.E-5_dp)
                 
                 counter = counter + 1
                 sqrts1 = sqrts1 + Dsqrts
 
+                ! assign last values of the file to the scattering amplitude when sqrt(s) is out of the domain
                 if (sqrts1 > fsqrts(sdim)) then
                     Itpr = tpr(sdim)
                     Itpi = tpi(sdim)
@@ -245,17 +248,19 @@ contains
                 Vh = 0.5_dp*(1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
             
                 if (part_charge == 1) then
-                    sqrts2 = Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                    sqrts2 = Vc(x) + Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
                 else if (part_charge == 2) then
                     sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
                 end if
                 
                 PRINT *, "Loop", counter, sqrts1, sqrts2, abs(sqrts1 - sqrts2)
-                if (sqrts2 < 0._dp) STOP
+                !WRITE(33,*) counter, sqrts1, sqrts2, abs(sqrts1 - sqrts2)
+                !if (sqrts2 < 0._dp) STOP
             end do
 
-            PRINT *, "OUT OF THE LOOP!"
-            STOP
+            close(33)
+
+            !PRINT *, "Loop", sqrts1, sqrts2, abs(sqrts1 - sqrts2)
 
         end function random_guess
 
@@ -288,8 +293,10 @@ contains
                 ffunc = f_xa * func(xt)
                 if (ffunc < 0) then
                     xb = xt
+                    f_xb = func(xb)
                 else if (ffunc > 0) then
                     xa = xt
+                    f_xa = func(xa)
                 else
                     print *, color("ERROR at 'Regula Falsi' subroutine: function not greater nor smaller than 0", c_red)
                 end if
@@ -299,9 +306,9 @@ contains
                 !    PRINT *, "'Regula falsi' didn't coverged! Function value =", ffunc, "when it should be 0."
                 !    go to 738
                 !end if
-                f_xa = func(xa)
-                f_xb = func(xb)
                 xt = xa - f_xa * (xb - xa) / (f_xb - f_xa)
+                PRINT *, xt, func(xt)
+                if (ffunc == 0._dp) STOP
             end do
 738         continue
 
@@ -384,7 +391,7 @@ contains
             Vh = 0.5_dp*(1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
             
             if (part_charge == 1) then
-                sqrts2 = Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                sqrts2 = Vc(x) + Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
             else if (part_charge == 2) then
                 sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
             end if

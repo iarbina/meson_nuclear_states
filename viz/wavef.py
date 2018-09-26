@@ -100,7 +100,7 @@ def main():
 
 	fig = plt.figure(facecolor='w',figsize=(7,5))
 	ax = fig.add_subplot(111)
-	ax.plot(x,swf,'-',label=r"WF")
+	ax.plot(x,swf,'.',label=r"WF")
 	ax.set_xlabel(r"$r$ (fm)")
 	ax.set_ylabel(r"$|u|^2$ ($\mathrm{fm}^{-1}$)")
 	ax.set_xlim(0,10)

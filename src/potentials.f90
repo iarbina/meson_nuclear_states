@@ -191,7 +191,7 @@ contains
         deallocate(Q)
         deallocate(AU)
 
-        PRINT *, "Calculated sqrts value =", sqrts_out
+        !PRINT *, "Calculated sqrts value =", sqrts_out
 
         return
     contains
@@ -324,7 +324,7 @@ contains
             ! internal variables
             real(dp) :: ffunc
             real(dp) :: xa, xb
-            real(dp), parameter :: epsi = 1.0E-6_dp
+            real(dp), parameter :: epsi = 1.0E-8_dp
 
             ! define variables
             xa = xa_in
@@ -354,7 +354,6 @@ contains
                 !    go to 739
                 !end if
                 xt = 0.5_dp*(xa + xb)
-!                PRINT *, "***", xa, func(xa), xb, func(xb)
             end do
 739         continue
 
@@ -396,7 +395,7 @@ contains
                 sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
             end if
             func = sqrts1 - sqrts2
-            !PRINT *, "SQRTS", sqrts1, sqrts2
+            !PRINT *, "SQRTS", sqrts1, sqrts2, abs(sqrts1 - sqrts2)
             return
         end function func
 

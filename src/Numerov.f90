@@ -18,7 +18,7 @@ subroutine Numerov (part_charge, pot_type, BE_out)
 
     ! internal variables
     real(dp), parameter :: dx = 1.0E-1_dp
-    real(dp), parameter :: delta = 1.0E-1_dp
+    real(dp), parameter :: delta = 1.0E-2_dp
     real(dp) :: xturn, rho0
     real(dp) :: Er0, Ei0, Er, Ei 
     real(dp) :: G0, G1, Gx, Gy, MG

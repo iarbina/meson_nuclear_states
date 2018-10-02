@@ -18,7 +18,7 @@ subroutine Numerov (part_charge, pot_type, BE_out)
 
     ! internal variables
     real(dp), parameter :: dx = 1.0E-1_dp
-    real(dp), parameter :: delta = 1.0E-2_dp
+    real(dp), parameter :: delta = 1.0E-1_dp
     real(dp) :: xturn, rho0
     real(dp) :: Er0, Ei0, Er, Ei 
     real(dp) :: G0, G1, Gx, Gy, MG
@@ -53,8 +53,10 @@ subroutine Numerov (part_charge, pot_type, BE_out)
         Er0 = abs( real(ChVopt(0.0_dp, Density(0.0_dp, dx, rho0))))
         Ei0 = abs(aimag(ChVopt(0.0_dp, Density(0.0_dp, dx, rho0))))
     else if (pot_type == 4) then
-        Er0 = 17.706_dp
-        Ei0 = 30.797_dp
+        !Er0 = abs( real(SelfEnergy(0._dp, Density(0._dp, dx, rho0), BE, part_charge, pot_type)) )*0.5_dp/hmass
+        !Ei0 = abs(aimag(SelfEnergy(0._dp, Density(0._dp, dx, rho0), BE, part_charge, pot_type)) )*0.5_dp/hmass
+        Er0 = 20._dp
+        Ei0 = 40._dp
     else if (pot_type == 5) then
         Er0 = 100.0_dp
         Ei0 = 100.0_dp

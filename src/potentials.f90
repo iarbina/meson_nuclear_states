@@ -369,7 +369,8 @@ contains
             real(dp), intent(in) :: sqrts1
 
             ! internal variables
-            real(dp) :: sqrts2
+            real(dp), parameter :: aN = 0.65_dp, UN0 = 50._dp
+            real(dp) :: s, sqrts2, Eh, EN, KinN, UN, ph2, pN2, sqrts22
             
             ! interpolation of the scattering amplitude for a given sqrt(s) (cm energy)
             call SPLS3 (fsqrts,tpr,sdim,sqrts1,Itpr,1,Q,AU,1,0)
@@ -387,12 +388,22 @@ contains
                 ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
             end if
 
+            ! Meson-Nucleon interaction potential
             Vh = 0.5_dp*(1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
+
+            ! Nucleon potential in the nucleus
+            !UN = UN0 / (1._dp + exp( -(x - Rn)/a ))
+            
+
+            KinN = 23._dp*(dens/rhoc)**(2./3)
             
             if (part_charge == 1) then
-                sqrts2 = Vc(x) + Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                sqrts22 = Vc(x) + Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                sqrts2 = sqrt( (hmass - real(Bh) + nmass + KinN - UN)**2 - (Eh - Vh - Vc(x))**2 + hmass**2 - 2._dp*nmass*KinN )
+                PRINT *, sqrts2, sqrts22, abs( sqrts2 - sqrts22 )
             else if (part_charge == 2) then
-                sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                sqrts2 = sqrt( (hmass - real(Bh) + nmass + KinN - UN)**2 - (Eh - Vh)**2 + hmass**2 - 2._dp*nmass*KinN )
+                !sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
             end if
             func = sqrts1 - sqrts2
             !PRINT *, "SQRTS", sqrts1, sqrts2, abs(sqrts1 - sqrts2)

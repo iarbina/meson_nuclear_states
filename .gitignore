@@ -1,0 +1,8 @@
+kk
+*.o
+*.mod
+.*.swm
+.*.swn
+.*.swp
+.*.swo
+fort.1000

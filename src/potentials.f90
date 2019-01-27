@@ -1,3 +1,5 @@
+! This module contains the different potentials and self-energies
+! that serves as input into the Klein-Gordon equation.
 module potentials
 
     use ansi_colors
@@ -213,8 +215,8 @@ contains
         end if
 
         ! Nucleon potential in the nucleus
-        UN = - UN0 / (1._dp + exp( (x - Rn)/a0 )) 
-        !UN = - 50._dp * dens/rhoc
+        !UN = - UN0 / (1._dp + exp( (x - Rn)/a0 )) 
+        UN = - 50._dp * dens/rhoc
         KinN = 23._dp*(dens/rhoc)**(2./3)
         EN = KinN + UN
        
@@ -246,12 +248,13 @@ contains
 !
 !        end if
 
+        ! We expect the subthreshols energy to be in this range
         sqrts_a = 1350._dp
         sqrts_b = 1550._dp
 
 
-        !call regula_falsi (sqrts_a, sqrts_b, sqrts_out)
         call bisection (sqrts_a, sqrts_b, sqrts_out)
+        !call regula_falsi (sqrts_a, sqrts_b, sqrts_out)
         !sqrts_out = random_guess()
 
 
@@ -281,6 +284,149 @@ contains
 
         return
     contains
+
+        !--------------------------------------------------
+        ! Bisection Method routine to solve for sqrt(s)
+        !--------------------------------------------------
+        subroutine bisection (xa_in, xb_in, xt)
+
+            ! external variables
+            real(dp), intent(in)  :: xa_in, xb_in
+            real(dp), intent(out) :: xt
+
+            ! internal variables
+            real(dp) :: ffunc
+            real(dp) :: xa, xb
+            real(dp), parameter :: epsi = 1.0E-6_dp
+
+            ! define variables
+            xa = xa_in
+            xb = xb_in
+
+
+            ! Bisection method to get sqrts
+            xt = 0.5_dp*(xa + xb)
+
+            do while (abs(xa - xb) > epsi*xt)
+
+                ffunc = func(xa) * func(xt)
+                if (ffunc < 0) then
+                    xb = xt
+                else if (ffunc > 0) then
+                    xa = xt
+                else
+                    print *, color("ERROR (Bisection subroutine): ",c_red),'function not greater nor smaller than 0 ', 'f =', ffunc
+                    STOP
+                end if
+
+                !if (xt == xa .or. xt == xb) then
+                !    PRINT *, "Bisection didn't coverged! Function value =", ffunc, "when it should be 0."
+                !    go to 739
+                !end if
+
+                xt = 0.5_dp*(xa + xb)
+
+            end do
+739         continue
+
+#if (DEBUG >= 3)
+    write(FDEB,*) 'Out of Bisection: xa, xt, xb =', xa, xt, xb
+#endif
+
+            return
+        end subroutine bisection
+
+        real(dp) function func(sqrts1)
+
+            ! external subroutines
+            external :: spls
+            external :: SPLS3
+
+            ! external variables
+            real(dp), intent(in) :: sqrts1
+
+            ! internal variables
+            real(dp) :: s, sqrts2, sqrts22
+            real(dp), allocatable, dimension(:) :: QQ, AUU
+
+        ! the calculation depends on wheter Kaons or etas are used
+            
+            ! For KAONS
+            if (part_type == 1 .or. part_type == 2) then
+
+                ! interpolation of the scattering amplitude for a given sqrt(s) (cm energy)
+                ! now the input of the interpolation is the previous interpolation in density
+                call SPLS3 (fsqrts2d(:,1),DItpr,sdim,sqrts1,Itpr,1,Q,AU,1,0)
+                call SPLS3 (fsqrts2d(:,1),DItpi,sdim,sqrts1,Itpi,1,Q,AU,1,0)
+                call SPLS3 (fsqrts2d(:,1),DItnr,sdim,sqrts1,Itnr,1,Q,AU,1,0)
+                call SPLS3 (fsqrts2d(:,1),DItni,sdim,sqrts1,Itni,1,Q,AU,1,0)
+
+
+                if (part_charge == 1) then
+                    tp = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
+                    tn = cmplx(Itnr,Itni)               ! neutron scattering amplitude
+                else if (part_charge == 2) then
+                    tn = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
+                    tp = cmplx(Itnr,Itni)               ! neutron scattering amplitude
+                end if
+                    
+                ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
+
+            ! For ETA particles
+            else if (part_type == 3) then
+
+                if (sqrts1 <= Resqrts(1)) then
+                    IReFhN = ReFetaN(1)
+                else if (sqrts1 >= Resqrts( size(Resqrts) )) then
+                    IReFhN = ReFetaN(size(Resqrts))
+                else
+                    call spls (Resqrts,ReFetaN,size(Resqrts),sqrts1,IReFhN)
+                end if
+
+                if (sqrts1 <= Imsqrts(1)) then
+                    IImFhN = ImFetaN(1)
+                else if (sqrts1 >= Imsqrts( size(Imsqrts) )) then
+                    IImFhN = ImFetaN(size(Resqrts))
+                else
+                    call spls (Imsqrts,ImFetaN,size(Imsqrts),sqrts1,IImFhN)
+                end if
+                
+                FhN = cmplx(IReFhN, IImFhN)
+            
+            end if
+
+            ! Meson-Nucleon interaction potential
+            if (pot_type == 4) then
+                Vh = 0.5_dp*(1.0_dp + nmass/real(wh))*ThN*dens*hbarc**3/sqrts1
+            else if (pot_type == 5) then
+                Vh = -2._dp*pi*(1._dp + real(wh)/nmass)*FhN*dens*hbarc**2/real(wh)
+            end if
+
+            
+            ! define sqrt(s) needed to compute the self-energy
+            ! there are two definitions of sqrt(s)
+            ! the first one is commeted. To use it discomment and comment the other
+            if (part_charge == 1) then
+                
+                !sqrts2 = Vc(x) + Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                sqrts2 = sqrt( (hmass - real(Bh) + nmass + KinN + UN)**2 &
+                - (hmass - real(Bh) - Vh - Vc(x))**2 + hmass**2 - 2._dp*nmass*KinN )
+            
+            else if (part_charge == 2) then
+                
+                !sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
+                sqrts2 = sqrt( (hmass - real(Bh) + nmass + KinN + UN)**2 &
+                 - (hmass - real(Bh) - Vh)**2 + hmass**2 - 2._dp*nmass*KinN )
+            
+            end if
+
+            func = sqrts1 - sqrts2
+            
+            !PRINT *, "SQRTS", sqrts1, sqrts2, abs(sqrts1 - sqrts2)
+
+            return
+        end function func
+
 
         real(dp) function random_guess() result (sqrts1)
 
@@ -400,197 +546,7 @@ contains
 
             return
         end subroutine regula_falsi
-
-        subroutine bisection (xa_in, xb_in, xt)
-
-            ! external variables
-            real(dp), intent(in)  :: xa_in, xb_in
-            real(dp), intent(out) :: xt
-
-            ! internal variables
-            real(dp) :: ffunc
-            real(dp) :: xa, xb
-            real(dp), parameter :: epsi = 1.0E-6_dp
-
-            ! define variables
-            xa = xa_in
-            xb = xb_in
-
-
-            ! Bisection method to get sqrts
-            xt = 0.5_dp*(xa + xb)
-
-            do while (abs(xa - xb) > epsi*xt)
-
-                ffunc = func(xa) * func(xt)
-                if (ffunc < 0) then
-                    xb = xt
-                else if (ffunc > 0) then
-                    xa = xt
-                else
-                    print *, color("ERROR (Bisection subroutine): ",c_red),'function not greater nor smaller than 0 ', 'f =', ffunc
-                    STOP
-                end if
-
-                !if (xt == xa .or. xt == xb) then
-                !    PRINT *, "Bisection didn't coverged! Function value =", ffunc, "when it should be 0."
-                !    go to 739
-                !end if
-
-                xt = 0.5_dp*(xa + xb)
-
-            end do
-739         continue
-
-#if (DEBUG >= 3)
-    write(FDEB,*) 'Out of Bisection: xa, xt, xb =', xa, xt, xb
-#endif
-
-            return
-        end subroutine bisection
-
-        real(dp) function func(sqrts1)
-
-            ! external subroutines
-            external :: spls
-            external :: SPLS3
-
-            ! external variables
-            real(dp), intent(in) :: sqrts1
-
-            ! internal variables
-            real(dp) :: s, sqrts2, sqrts22
-            real(dp), allocatable, dimension(:) :: QQ, AUU
-
-        ! the calculation depends on wheter Kaons or etas are used
-            
-            ! For KAONS
-            if (part_type == 1 .or. part_type == 2) then
-
-                ! interpolation of the scattering amplitude for a given sqrt(s) (cm energy)
-                ! now the input of the interpolation is the previous interpolation in density
-                call SPLS3 (fsqrts2d(:,1),DItpr,sdim,sqrts1,Itpr,1,Q,AU,1,0)
-                call SPLS3 (fsqrts2d(:,1),DItpi,sdim,sqrts1,Itpi,1,Q,AU,1,0)
-                call SPLS3 (fsqrts2d(:,1),DItnr,sdim,sqrts1,Itnr,1,Q,AU,1,0)
-                call SPLS3 (fsqrts2d(:,1),DItni,sdim,sqrts1,Itni,1,Q,AU,1,0)
-
-
-                if (part_charge == 1) then
-                    tp = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
-                    tn = cmplx(Itnr,Itni)               ! neutron scattering amplitude
-                else if (part_charge == 2) then
-                    tn = cmplx(Itpr,Itpi)               ! proton  scattering amplitude
-                    tp = cmplx(Itnr,Itni)               ! neutron scattering amplitude
-                end if
-                    
-                ThN = 0.5_dp*(tp + tn)              ! total scattering amplitude
-
-            ! For ETA particles
-            else if (part_type == 3) then
-
-                ! free scattering amplitude
-                if (eta_amp_type == 1) then
-
-GO TO 655
-                    allocate(QQ ( size(f_Resqrts) ))
-                    allocate(AUU( size(f_Resqrts) ))
-
-                    call SPLS3 (f_Resqrts,f_ReFetaN,size(f_Resqrts),sqrts1,IReFhN,1,QQ,AUU,1,0)
-                    call SPLS3 (f_Imsqrts,f_ImFetaN,size(f_Imsqrts),sqrts1,IImFhN,1,QQ,AUU,1,0)
-                    
-                    deallocate(QQ)
-                    deallocate(AUU)
-
-655 CONTINUE
-!GO TO 655
-                    if (sqrts1 <= f_Resqrts(1)) then
-                        IReFhN = f_ReFetaN(1)
-                    else if (sqrts1 >= f_Resqrts( size(f_Resqrts) )) then
-                        IReFhN = f_ReFetaN(size(f_Resqrts))
-                    else
-                        call spls (f_Resqrts,f_ReFetaN,size(f_Resqrts),sqrts1,IReFhN)
-                    end if
-
-                    if (sqrts1 <= f_Imsqrts(1)) then
-                        IImFhN = f_ImFetaN(1)
-                    else if (sqrts1 >= f_Imsqrts( size(f_Imsqrts) )) then
-                        IImFhN = f_ImFetaN(size(f_Resqrts))
-                    else
-                        call spls (f_Imsqrts,f_ImFetaN,size(f_Imsqrts),sqrts1,IImFhN)
-                    end if
-!655 CONTINUE
-                
-                ! in-medium scattering amplitude
-                else if (eta_amp_type == 2) then
-
-GO TO 665
-                    allocate(QQ ( size(m_Resqrts) ))
-                    allocate(AUU( size(m_Resqrts) ))
-
-                    call SPLS3 (m_Resqrts,m_ReFetaN,size(m_Resqrts),sqrts1,IReFhN,1,QQ,AUU,1,0)
-                    call SPLS3 (m_Imsqrts,m_ImFetaN,size(m_Imsqrts),sqrts1,IImFhN,1,QQ,AUU,1,0)
-
-                    deallocate(QQ)
-                    deallocate(AUU)
-
-665 CONTINUE
-!GO TO 665
-                    if (sqrts1 <= m_Resqrts(1)) then
-                        IReFhN = m_ReFetaN(1)
-                    else if (sqrts1 >= m_Resqrts( size(m_Resqrts) )) then
-                        IReFhN = m_ReFetaN(size(f_Resqrts))
-                    else
-                        call spls (m_Resqrts,m_ReFetaN,size(m_Resqrts),sqrts1,IReFhN)
-                    end if
-
-                    if (sqrts1 <= m_Imsqrts(1)) then
-                        IImFhN = m_ImFetaN(1)
-                    else if (sqrts1 >= m_Imsqrts( size(m_Imsqrts) )) then
-                        IImFhN = m_ImFetaN(size(f_Resqrts))
-                    else
-                        call spls (m_Imsqrts,m_ImFetaN,size(m_Imsqrts),sqrts1,IImFhN)
-                    end if
-!665 CONTINUE
-
-                end if
-
-
-                FhN = cmplx(IReFhN, IImFhN)
-            
-            end if
-
-            ! Meson-Nucleon interaction potential
-            if (pot_type == 4) then
-                Vh = 0.5_dp*(1.0_dp + nmass/wh)*ThN*dens*hbarc**3/sqrts1
-            else if (pot_type == 5) then
-                Vh = -2._dp*pi*(1._dp + wh/nmass)*FhN*dens*hbarc**2/wh
-            end if
-
-            
-            ! define sqrt(s) needed to compute the self-energy
-            if (part_charge == 1) then
-                
-                sqrts2 = Vc(x) + Eth - Bn - xin*(real(Bh)+Vc(x)) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
-                !sqrts2 = sqrt( (hmass - real(Bh) + nmass + KinN + UN)**2 &
-                !- (hmass - real(Bh) - Vh - Vc(x))**2 + hmass**2 - 2._dp*nmass*KinN )
-                !PRINT *, sqrts2, sqrts22, abs( sqrts2 - sqrts22 )
-            
-            else if (part_charge == 2) then
-                
-                !sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
-                !sqrts2 = sqrt( (hmass - real(Bh) + nmass + KinN + UN)**2 &
-                ! - (hmass - real(Bh) - Vh)**2 + hmass**2 - 2._dp*nmass*KinN )
-                sqrts2 = Eth - Bn - xin*real(Bh) - 15.1_dp*(dens/rhoc)**(2./3) + xih*real(Vh)
-            
-            end if
-
-            func = sqrts1 - sqrts2
-            
-            !PRINT *, "SQRTS", sqrts1, sqrts2, abs(sqrts1 - sqrts2)
-
-            return
-        end function func
-
+    
     end function SelfEnergy
 
     !----------------------------------------------------------------------

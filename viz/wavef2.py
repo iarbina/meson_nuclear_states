@@ -5,6 +5,20 @@ import os, glob
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+'''
+Author:      Ignacio López de Arbina
+Project:     Master Thesis
+Institution: Univeristy of Barcelona
+email:		 ignacio.arbina@gmail.com
+
+Summary: 
+This script plots the real and the imaginary parts, separately,
+of the readial wave function solution of the calculation done
+by the program which solves Klein-Gordon equation with a given
+optical potential.
+'''
+
 def main():
 	
 	
@@ -102,33 +116,46 @@ def main():
 # Plot	
 	
 	plt.rc('text',usetex=True)
-	font = {'family':'serif','size':15}
+	font = {'family':'serif','size':17}
 	plt.rc('font',**font)
 	
 	xx = np.linspace(0,12,50)
 
-	fig = plt.figure(facecolor='w',figsize=(7,5))
+	fig = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax = fig.add_subplot(111)
-	ax.plot(lx,lrwf,'*',label=r"Left integrtion")
-	ax.plot(rx,rrwf,'.',label=r"Right integration")
+	ax.plot(lx,lrwf,'*',label=r"Forward int.")
+	ax.plot(rx,rrwf,'.',label=r"Backward int.")
 	ax.set_xlabel(r"$r$ (fm)")
-	ax.set_ylabel(r"$\mathrm{Re}(u)$ ($\mathrm{fm}^{-1}$)")
+	ax.set_ylabel(r"$\mathrm{Re}(u)$ ($\mathrm{fm}^{-1/2}$)")
 	#ax.set_xlim(0,6)
-	#ax.set_ylim(-210,10)
+	#ax.set_ylim(-3,5)
 	ax.tick_params(which='both',direction='in',top=True,right=True)
-	ax.legend()
+	ax.legend(loc=1, prop={'size': 15}, frameon=False, handletextpad=0.1, markerfirst=False)
+	plt.axvline(x=lx[-1], linestyle='--', linewidth=0.5, color='grey')
+	plt.locator_params(axis='x', nbins=12)
+	plt.locator_params(axis='y', nbins=10)
 	plt.tight_layout()
 	
-	fig2 = plt.figure(facecolor='w',figsize=(7,5))
+	fig2 = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax2 = fig2.add_subplot(111)
-	ax2.plot(lx,-liwf,'*',label=r"Left integration")
-	ax2.plot(rx,-riwf,'.',label=r"Right integration")
+	ax2.plot(lx,liwf,'*',label=r"Forward int.")
+	ax2.plot(rx,riwf,'.',label=r"Backward int.")
 	ax2.set_xlabel(r"$r$ (fm)")
-	ax2.set_ylabel(r"$\mathrm{Im}(u)$ ($\mathrm{fm}^{-1}$)")
+	ax2.set_ylabel(r"$\mathrm{Im}(u)$ ($\mathrm{fm}^{-1/2}$)")
 	#ax2.set_xlim(0,6)
-	#ax2.set_ylim(-210,10)
+	#ax2.set_ylim(-1,13)
 	ax2.tick_params(which='both',direction='in',top=True,right=True)
-	ax2.legend()
+	ax2.legend(loc=1, prop={'size': 15}, frameon=False, handletextpad=0.1, markerfirst=False)
+	plt.axvline(x=lx[-1], linestyle='--', linewidth=0.5, color='grey')
+#	ax2.annotate('continuity point',
+#			xy=(rx[0]+0.1,riwf[0]),  # theta, radius
+#			xytext=(0.6, 0.55),    # fraction, fraction
+#			textcoords='figure fraction',
+#			arrowprops=dict(arrowstyle="-|>", connectionstyle="arc3"),
+#			horizontalalignment='left',
+#			verticalalignment='bottom')
+	plt.locator_params(axis='x', nbins=12)
+	plt.locator_params(axis='y', nbins=10)
 	plt.tight_layout()
 	
 	plt.show()

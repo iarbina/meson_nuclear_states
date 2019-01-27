@@ -47,10 +47,7 @@ module inp_data
     real(dp), allocatable, dimension(:,:) :: fsqrts2d, tpr2d, tpi2d, tnr2d, tni2d
 
     ! eta free scattering amplitudes
-    real(dp), allocatable, dimension(:) :: f_Resqrts, f_ReFetaN, f_Imsqrts, f_ImFetaN
-
-    ! eta in-medium scattering amplitudes
-    real(dp), allocatable, dimension(:) :: m_Resqrts, m_ReFetaN, m_Imsqrts, m_ImFetaN
+    real(dp), allocatable, dimension(:) :: Resqrts, ReFetaN, Imsqrts, ImFetaN
 
 contains
 
@@ -180,65 +177,97 @@ contains
         ! internal variables
         integer :: i, ios
         integer, parameter :: funit  = 736
-        integer, parameter :: fResize = 140
-        integer, parameter :: fImsize = 133
-        integer, parameter :: mResize = 71
-        integer, parameter :: mImsize = 66
+        integer :: Resize
+        integer :: Imsize
         character(len=*), parameter :: fpath = 'inp/eta_amplitudes/'
 
-        open(unit=funit, file=fpath//'free_ReFetaN.dat', status='old', action='read', iostat=ios)
-        open(unit=funit+1, file=fpath//'free_ImFetaN.dat', status='old', action='read', err=92, iostat=ios)
-        open(unit=funit+2, file=fpath//'inme_ReFetaN.dat', status='old', action='read', err=92, iostat=ios)
-        open(unit=funit+3, file=fpath//'inme_ImFetaN.dat', status='old', action='read', err=92, iostat=ios)
+
+        if (eta_amp_type == 1) then
+
+            Resize = 102
+            Imsize = 125
+            
+            open(unit=funit, file=fpath//'CS_model/free_Re_CS.dat', status='old', action='read', iostat=ios)
+            open(unit=funit+1, file=fpath//'CS_model/free_Im_CS.dat', status='old', action='read', err=92, iostat=ios)
+
+        else if (eta_amp_type == 2) then
+
+            Resize = 71
+            Imsize = 66
+
+            open(unit=funit, file=fpath//'CS_model/inme_Re_CS.dat', status='old', action='read', err=92, iostat=ios)
+            open(unit=funit+1, file=fpath//'CS_model/inme_Im_CS.dat', status='old', action='read', err=92, iostat=ios)
+
+        else if (eta_amp_type == 3) then
+
+            Resize = 99
+            Imsize = 110
+
+            open(unit=funit, file=fpath//'GW_model/free_Re_GW.dat', status='old', action='read', err=92, iostat=ios)
+            open(unit=funit+1, file=fpath//'GW_model/free_Im_GW.dat', status='old', action='read', err=92, iostat=ios)
+        else if (eta_amp_type == 4) then
+
+            Resize = 57
+            Imsize = 65
+
+            open(unit=funit, file=fpath//'IOV_model/free_Re_IOV.dat', status='old', action='read', err=92, iostat=ios)
+            open(unit=funit+1, file=fpath//'IOV_model/free_Im_IOV.dat', status='old', action='read', err=92, iostat=ios)
+
+        else if (eta_amp_type == 5) then
+
+            Resize = 74
+            Imsize = 90
+
+            open(unit=funit, file=fpath//'KSW_model/free_Re_KSW.dat', status='old', action='read', err=92, iostat=ios)
+            open(unit=funit+1, file=fpath//'KSW_model/free_Im_KSW.dat', status='old', action='read', err=92, iostat=ios)
+
+        else if (eta_amp_type == 6) then
+
+            Resize = 73
+            Imsize = 88
+
+            open(unit=funit, file=fpath//'M2_model/free_Re_M2.dat', status='old', action='read', err=92, iostat=ios)
+            open(unit=funit+1, file=fpath//'M2_model/free_Im_M2.dat', status='old', action='read', err=92, iostat=ios)
+
+        else
+
+            print *, color( 'Error: Problems opening eta scattering amplitudes files', c_red)
+            stop
+
+        end if
 
 92      continue
+
         if (ios /= 0) then
             print *, 'ERROR: Problem opening eta scattering amplitude files'
+            print *, 'ois =', ios
             STOP
         else
-#if (DEBUG >= 3)
+#if (DEBUG >= 1)
             print *, color('Eta scattering amplitude files open successfully', c_pink)
 #endif
         end if
 
 
-        allocate(f_Resqrts(fResize))
-        allocate(f_ReFetaN(fResize))
-        allocate(f_Imsqrts(fImsize))
-        allocate(f_ImFetaN(fImsize))
-        allocate(m_Resqrts(mResize))
-        allocate(m_ReFetaN(mResize))
-        allocate(m_Imsqrts(mImsize))
-        allocate(m_ImFetaN(mImsize))
+
+        allocate(Resqrts(Resize))
+        allocate(ReFetaN(Resize))
+        allocate(Imsqrts(Imsize))
+        allocate(ImFetaN(Imsize))
 
         read(funit,*)
-        do i = 1, fResize
-           read(funit,*) f_Resqrts(i), f_ReFetaN(i)
+        do i = 1, Resize
+           read(funit,*) Resqrts(i), ReFetaN(i)
         end do
 
         read(funit+1,*)
-        do i = 1, fImsize
-           read(funit+1,*) f_Imsqrts(i), f_ImFetaN(i)
+        do i = 1, Imsize
+           read(funit+1,*) Imsqrts(i), ImFetaN(i)
         end do
 
-        read(funit+2,*)
-        do i = 1, mResize
-           read(funit+2,*) m_Resqrts(i), m_ReFetaN(i)
-        end do
-
-        read(funit+3,*)
-        do i = 1, mImsize
-           read(funit+3,*) m_Imsqrts(i), m_ImFetaN(i)
-        end do
-
-        ! add threshold energy to the sqrts from eta scattering amplitude data
-        f_Resqrts(:) = (/( f_Resqrts(i)+Emass+nmass, i=1, size(f_Resqrts) )/)
-        f_Imsqrts(:) = (/( f_Imsqrts(i)+Emass+nmass, i=1, size(f_Imsqrts) )/)
 
         close(funit)
         close(funit+1)
-        close(funit+2)
-        close(funit+3)
 
     end subroutine read_eta_scatt_ampl
 

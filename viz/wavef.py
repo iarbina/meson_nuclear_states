@@ -5,6 +5,19 @@ import os, glob
 import numpy as np
 import matplotlib.pyplot as plt
 
+'''
+Author:      Ignacio López de Arbina
+Project:     Master Thesis
+Institution: Univeristy of Barcelona
+email:		 ignacio.arbina@gmail.com
+
+Summary: 
+This script plots the real and the imaginary parts, separately,
+of the readial wave function solution of the calculation done
+by the program which solves Klein-Gordon equation with a given
+optical potential.
+'''
+
 def main():
 	
 	
@@ -70,7 +83,7 @@ def main():
 	hmass = 493.70   # Mass of the hadron (in this case the kaon)
 	nmass = 939.0    # Average nucleon mass
 	mu = hmass*nmass*A/(hmass+nmass*A) # Reduced mass
-	dx = 1e-2
+	dx = 1e-3
    	
    	def DenSuma():
    		suma = 0.0
@@ -94,7 +107,13 @@ def main():
 		elif (A > 16):
 			Density = rho0/(1.0+np.exp((x-Rn)/a0))
 		return Density
-   	
+   
+	def Norma(r,wf):
+		rr = np.array(r)
+		ww = np.array(wf)
+		return np.sqrt(sum(rr*ww))
+
+	print Norma(x, swf)
 
 # Plot	
 	
@@ -104,15 +123,17 @@ def main():
 	
 	xx = np.linspace(0,12,50)
 
-	fig = plt.figure(facecolor='w',figsize=(7,5))
+	fig = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax = fig.add_subplot(111)
-	ax.plot(x,swf,'.',label=r"WF")
+	ax.plot(x,swf/Norma(x, swf),'.',label=r"WF")
 	ax.set_xlabel(r"$r$ (fm)")
 	ax.set_ylabel(r"$|u|^2$ ($\mathrm{fm}^{-1}$)")
 	ax.set_xlim(0,10)
 	#ax.set_ylim(0,*)
 	ax.tick_params(which='both',direction='in',top=True,right=True)
 	ax.legend()
+	plt.locator_params(axis='x', nbins=10)
+	plt.locator_params(axis='y', nbins=10)
 	plt.tight_layout()
 	plt.show()
 	

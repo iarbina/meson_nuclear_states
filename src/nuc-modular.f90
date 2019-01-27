@@ -48,11 +48,10 @@ program nuc_klein_gordon
     call read_nuclei_data ()            ! required for any calculation
     call read_chiral_potential ()       ! optional: only chiral potential
     call read_kaon_scatt_ampl ()   ! optional: only scatt potential
-    call read_eta_scatt_ampl ()
+    !call read_eta_scatt_ampl ()
 
-    
-    
-    
+
+
     ! Print the heading
     print *, color(repeat('*',60), head_color)
     print *, color('|', head_color),    &
@@ -168,15 +167,25 @@ program nuc_klein_gordon
     if (pot_type == 5 .and. part_type == 3) then
         
         print *, color('    Select a scattering amplitude', text_color)
-        print *, color('        1. Free scattering amplitude', text_color)
-        print *, color('        2. In-medium scattering amplitude', text_color)
+        print *, color('        1. Free CS scattering amplitude', text_color)
+        print *, color('        2. In-medium CS scattering amplitude', text_color)
+        print *, color('        3. Free GW scattering amplitude', text_color)
+        print *, color('        4. Free IOV scattering amplitude', text_color)
+        print *, color('        5. Free KSW scattering amplitude', text_color)
+        print *, color('        6. Free M2 scattering amplitude', text_color)
         read(*,*, err = 911) eta_amp_type
 
-        if (eta_amp_type /= 1 .and. eta_amp_type /= 2) then
+        if (eta_amp_type /= 1 .and. eta_amp_type /= 2 .and. &
+            eta_amp_type /= 3 .and. eta_amp_type /= 4 .and. &
+            eta_amp_type /= 5 .and. eta_amp_type /= 6) then
             
-            print *, 'ERROR: You shall choose between 1 and 2!'
+            print *, 'ERROR: You shall choose between 1, 2, 3, 4, 5 or 6!'
             call sleep(2)
             go to 911
+
+        else
+
+            call read_eta_scatt_ampl ()
         
         end if
 
@@ -250,7 +259,7 @@ program nuc_klein_gordon
     ! Save in file result
     open(unit = 983, file = 'out/solutions.out', &
          status = 'old', position = 'append', action = 'write')
-    WRITE(983,*) Z, A, real(BE_in), 2.0_dp*aimag(BE_in), part_charge, pot_type, sqrts_out
+    WRITE(983,*) Z, A, real(BE_in), 2.0_dp*aimag(BE_in), sqrts_out, part_charge, pot_type
     close(unit = 983)
 
 

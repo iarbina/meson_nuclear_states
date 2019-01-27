@@ -4,8 +4,8 @@ pictures/
 .many
 .eta
 kk
-*.o
-*.mod
+obj/*.o
+obj/*.mod
 .*.swm
 .*.swn
 .*.swp

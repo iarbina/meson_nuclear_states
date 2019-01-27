@@ -1,5 +1,6 @@
 bin/*
-obj/*
+obj/*.o
+obj/*.mod
 viz/sty/
 *pictures/
 .old

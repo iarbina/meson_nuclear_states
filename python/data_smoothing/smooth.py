@@ -313,77 +313,79 @@ def main():
 	fig3 = plt.figure(facecolor='w',figsize=(7,5))
 	ax3 = fig3.add_subplot(111)
 	ax3.plot(sqrts00-0*Eth, TKN2(tpr00, tpi00, tnr00, tni00), pt2, markersize = ps2, label = r"$0.00 \rho_0$")
-	ax3.plot(sqrts025-0*Eth, TKN2(tpr025, tpi025, tnr025, tni025), pt2, markersize = ps2, label = r"$0.25 \rho_0$")
+	#ax3.plot(sqrts025-0*Eth, TKN2(tpr025, tpi025, tnr025, tni025), pt2, markersize = ps2, label = r"$0.25 \rho_0$")
 	ax3.plot(sqrts025_s-0*Eth, TKN2(tpr025_sm, tpi025_sm, tnr025_sm, tni025_sm), '-', markersize = ps3, label = r"$0.25 \rho_0$ (smooth)")
-	ax3.plot(sqrts05-0*Eth, TKN2(tpr05, tpi05, tnr05, tni05), pt2, markersize = ps2, label = r"$0.50 \rho_0$")
-	ax3.plot(sqrts05_s-0*Eth, TKN2(tpr05_sm, tpi05_sm, tnr05_sm, tni05_sm), '-', markersize = ps3, label = r"$0.25 \rho_0$ (smooth)")
-	ax3.plot(sqrts075-0*Eth, TKN2(tpr075, tpi075, tnr075, tni075), pt2, markersize = ps2, label = r"$0.75 \rho_0$")
-	ax3.plot(sqrts075_s-0*Eth, TKN2(tpr075_sm, tpi075_sm, tnr075_sm, tni075_sm), '-', markersize = ps3, label = r"$0.25 \rho_0$ (smooth)")
+	#ax3.plot(sqrts05-0*Eth, TKN2(tpr05, tpi05, tnr05, tni05), pt2, markersize = ps2, label = r"$0.50 \rho_0$")
+	ax3.plot(sqrts05_s-0*Eth, TKN2(tpr05_sm, tpi05_sm, tnr05_sm, tni05_sm), '-', markersize = ps3, label = r"$0.50 \rho_0$ (smooth)")
+	#ax3.plot(sqrts075-0*Eth, TKN2(tpr075, tpi075, tnr075, tni075), pt2, markersize = ps2, label = r"$0.75 \rho_0$")
+	ax3.plot(sqrts075_s-0*Eth, TKN2(tpr075_sm, tpi075_sm, tnr075_sm, tni075_sm), '-', markersize = ps3, label = r"$0.75 \rho_0$ (smooth)")
 	ax3.plot(sqrts10-0*Eth, TKN2(tpr10, tpi10, tnr10, tni10), pt2, markersize = ps2, label = r"$1.00 \rho_0$")
 	ax3.set_xlabel(r"$\sqrt{s}$ (MeV)")
 	ax3.set_ylabel(r"$|T_{KN}|^2$ ($\mathrm{MeV}^{-2}$)")
-	#ax3.set_xlim(0,6)
+	ax3.set_xlim(1350,1550)
 	#ax3.set_ylim(-210,10)
 	ax3.tick_params(which='both',direction='in',top=True,right=True)
 	ax3.legend()
-	plt.title('Smooth selected')
+	#plt.title('Smooth selected')
 	#plt.axvline(x=0, linestyle='--', linewidth=0.4, color='grey')
 	plt.tight_layout()
 	
 	
 	# Plot 4
 	
-	pt4 = '.'
+	pt4 = '-'
 	ps4 = 4
 	pt4s = '-'
 	ps4s = 4
 
-	fig4 = plt.figure(facecolor='w',figsize=(7,5))
+	fig4 = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax4 = fig4.add_subplot(111)
-	ax4.plot(sqrts00-0*Eth, tKN(tpr00, tnr00), pt4, markersize = ps4, label = r"$0.00 \rho_0$")
-	ax4.plot(sqrts025-0*Eth, tKN(tpr025, tnr025), pt4, markersize = ps4, label = r"$0.25 \rho_0$")
-	ax4.plot(sqrts025-0*Eth, tKN(tpr025_smooth, tnr025_smooth), pt4s, markersize = ps4, label = r"$0.25 \rho_0$ (smooth)")
-	ax4.plot(sqrts05-0*Eth, tKN(tpr05, tnr05), pt1, markersize = ps4, label = r"$0.25 \rho_0$")
-	ax4.plot(sqrts05-0*Eth, tKN(tpr05_smooth, tnr05_smooth), pt4s, markersize = ps4, label = r"$0.50 \rho_0$ (smooth)")
-	ax4.plot(sqrts075-0*Eth, tKN(tpr075, tnr075), pt4, markersize = ps4, label = r"$0.25 \rho_0$")
-	ax4.plot(sqrts075-0*Eth, tKN(tpr075_smooth, tnr075_smooth), pt4s, markersize = ps4, label=r"$0.75 \rho_0$ (smooth)")
+	ax4.plot(sqrts00-0*Eth, tKN(tpr00, tnr00), ':', markersize = ps4, label = r"$0.00 \rho_0$")
+	#ax4.plot(sqrts025-0*Eth, tKN(tpr025, tnr025), pt4, markersize = ps4, label = r"$0.25 \rho_0$")
+	ax4.plot(sqrts025-0*Eth, tKN(tpr025_smooth, tnr025_smooth), '-.', markersize = ps4, label = r"$0.25 \rho_0$")
+	#ax4.plot(sqrts05-0*Eth, tKN(tpr05, tnr05), pt1, markersize = ps4, label = r"$0.50 \rho_0$")
+	ax4.plot(sqrts05-0*Eth, tKN(tpr05_smooth, tnr05_smooth), '--', markersize = ps4, label = r"$0.50 \rho_0$ ")
+	#ax4.plot(sqrts075-0*Eth, tKN(tpr075, tnr075), pt4, markersize = ps4, label = r"$0.75 \rho_0$")
+	ax4.plot(sqrts075-0*Eth, tKN(tpr075_smooth, tnr075_smooth), '--', dashes=(5, 1), markersize = ps4, label=r"$0.75 \rho_0$")
 	ax4.plot(sqrts10-0*Eth, tKN(tpr10, tnr10), pt4, markersize = ps4, label=r"$1.00 \rho_0$")
 	ax4.set_xlabel(r"$\sqrt{s}$ (MeV)")
 	ax4.set_ylabel(r"$\mathrm{Re}[T_{KN}]$ ($\mathrm{MeV}^{-1}$)")
-	#ax4.set_xlim(0,6)
+	ax4.set_xlim(1350,1550)
 	#ax4.set_ylim(-210,10)
 	ax4.tick_params(which='both',direction='in',top=True,right=True)
-	ax4.legend()
-	plt.title('Smooth all')
+	ax4.legend(loc=4, frameon=False)
+	#plt.title('Smooth all')
+	plt.axvline(x=Eth, linestyle='--', linewidth=0.5, color='grey')
 	#plt.axvline(x=0, linestyle='--', linewidth=0.4, color='grey')
 	plt.tight_layout()
 
 
 	# Plot 5
 
-	pt5 = '.'
+	pt5 = '-'
 	ps5 = 4
 	pt5s = '-'
 	ps5s = 5
 	
-	fig5 = plt.figure(facecolor='w',figsize=(7,5))
+	fig5 = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax5 = fig5.add_subplot(111)
-	ax5.plot(sqrts00-0*Eth, tKN(tpi00, tni00), pt5, markersize = ps5, label = r"$0.00 \rho_0$")
-	ax5.plot(sqrts025-0*Eth, tKN(tpi025, tni025), pt5, markersize = ps5, label = r"$0.25 \rho_0$")
-	ax5.plot(sqrts025-0*Eth, tKN(tpi025_smooth, tni025_smooth), pt5s, markersize = ps5, label = r"$0.25 \rho_0$ (smooth)")
-	ax5.plot(sqrts025-0*Eth, tKN(tpi05, tni05), pt4, markersize = ps5, label = r"$0.25 \rho_0$")
-	ax5.plot(sqrts05-0*Eth, tKN(tpi05_smooth, tni05_smooth), pt5s, markersize = ps5, label = r"$0.50 \rho_0$ (smooth)")
-	ax5.plot(sqrts025-0*Eth, tKN(tpi075, tni075), pt5, markersize = ps5, label = r"$0.25 \rho_0$")
-	ax5.plot(sqrts075-0*Eth, tKN(tpi075_smooth, tni075_smooth), pt5s, markersize = ps5, label = r"$0.75 \rho_0$ (smooth)")
+	ax5.plot(sqrts00-0*Eth, tKN(tpi00, tni00), ':', markersize = ps5, label = r"$0.00 \rho_0$")
+	#ax5.plot(sqrts025-0*Eth, tKN(tpi025, tni025), pt5, markersize = ps5, label = r"$0.25 \rho_0$")
+	ax5.plot(sqrts025-0*Eth, tKN(tpi025_smooth, tni025_smooth), '-.', markersize = ps5, label = r"$0.25 \rho_0$ ")
+	#ax5.plot(sqrts025-0*Eth, tKN(tpi05, tni05), pt4, markersize = ps5, label = r"$0.50 \rho_0$")
+	ax5.plot(sqrts05-0*Eth, tKN(tpi05_smooth, tni05_smooth), '--', markersize = ps5, label = r"$0.50 \rho_0$")
+	#ax5.plot(sqrts025-0*Eth, tKN(tpi075, tni075), pt5, markersize = ps5, label = r"$0.75 \rho_0$")
+	ax5.plot(sqrts075-0*Eth, tKN(tpi075_smooth, tni075_smooth), '--', dashes=(5, 1),  markersize = ps5, label = r"$0.75 \rho_0$")
 	ax5.plot(sqrts10-0*Eth, tKN(tpi10, tni10), pt5, markersize = ps5, label = r"$1.00 \rho_0$")
 	ax5.set_xlabel(r"$\sqrt{s}$ (MeV)")
 	ax5.set_ylabel(r"$\mathrm{Im}[T_{KN}]$ ($\mathrm{MeV}^{-1}$)")
-	#ax5.set_xlim(0,6)
+	ax5.set_xlim(1350,1550)
 	#ax5.set_ylim(-210,10)
 	ax5.tick_params(which='both',direction='in',top=True,right=True)
-	ax5.legend()
-	plt.title('Smooth all')
+	ax5.legend(frameon=False)
+	#plt.title('Smooth all')
 	#plt.axvline(x=0, linestyle='--', linewidth=0.4, color='grey')
+	plt.axvline(x=Eth, linestyle='--', linewidth=0.5, color='grey')
 	plt.tight_layout()
 	
     
@@ -398,9 +400,9 @@ def main():
 	ax6.plot(sqrts025-0*Eth, TKN2(tpr025, tpi025, tnr025, tni025), pt6, markersize = ps6, label = r"$0.25 \rho_0$")
 	ax6.plot(sqrts025-0*Eth, TKN2(tpr025_smooth, tpi025_smooth, tnr025_smooth, tni025_smooth), '-', markersize = ps6, label = r"$0.25 \rho_0$ (smooth)")
 	ax6.plot(sqrts05-0*Eth, TKN2(tpr05, tpi05, tnr05, tni05), pt2, markersize = ps6, label = r"$0.50 \rho_0$")
-	ax6.plot(sqrts05-0*Eth, TKN2(tpr05_smooth, tpi05_smooth, tnr05_smooth, tni05_smooth), '-', markersize = ps6, label = r"$0.25 \rho_0$ (smooth)")
+	ax6.plot(sqrts05-0*Eth, TKN2(tpr05_smooth, tpi05_smooth, tnr05_smooth, tni05_smooth), '-', markersize = ps6, label = r"$0.50 \rho_0$ (smooth)")
 	ax6.plot(sqrts075-0*Eth, TKN2(tpr075, tpi075, tnr075, tni075), pt6, markersize = ps6, label = r"$0.75 \rho_0$")
-	ax6.plot(sqrts075-0*Eth, TKN2(tpr075_smooth, tpi075_smooth, tnr075_smooth, tni075_smooth), '-', markersize = ps6, label = r"$0.25 \rho_0$ (smooth)")
+	ax6.plot(sqrts075-0*Eth, TKN2(tpr075_smooth, tpi075_smooth, tnr075_smooth, tni075_smooth), '-', markersize = ps6, label = r"$0.75 \rho_0$ (smooth)")
 	ax6.plot(sqrts10-0*Eth, TKN2(tpr10, tpi10, tnr10, tni10), pt6, markersize = ps6, label = r"$1.00 \rho_0$")
 	ax6.set_xlabel(r"$\sqrt{s}$ (MeV)")
 	ax6.set_ylabel(r"$|T_{KN}|^2$ ($\mathrm{MeV}^{-2}$)")

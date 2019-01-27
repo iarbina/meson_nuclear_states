@@ -40,14 +40,15 @@ def main():
 			return a, b, c, d, e
 		else:
 			return a, b, c, d
+		
 #----------------------------------------------------------------------
 
-	datafile1 = "antiK_mares.dat"
-	Z1, A1, B1, G1 = reading(datafile1, 4)
+	datafile1 = "free_IOV.dat"
+	Z1, A1, B1, G1, SQRTS1 = reading(datafile1, 5)
 	
-	datafile2 = "antiK_ours.dat"
-	Z2, A2, B2, G2, S2 = reading(datafile2, 5)
-
+	datafile2 = "inme_CS.dat" 
+	Z2, A2, B2, G2, SQRTS2 = reading(datafile2, 5)
+	
 #----------------------------------------------------------------------
 	
 	pi = 3.14159265358979323846260
@@ -80,32 +81,39 @@ def main():
 # Plot----------------------------------------------------------------	
 	
 	plt.rc('text',usetex=True)
-	font = {'family':'serif','size':17}
+	font = {'family':'serif','size':15}
 	plt.rc('font',**font)
 	
 	xx = np.linspace(0,12,50)
 
-	ystep = 2.0
+	ystep = +1.0
 	xstep = -1.0
 
+	indices = [1, 2, 4, 6, 7]
 	fig = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax = fig.add_subplot(111)
-	ax.plot(AA1, BB1, '--', markersize=15, linewidth=0.5, label=r'$\sqrt{s}$ (1)')
-	ax.plot(AA2, BB2, '--', markersize=15, linewidth=0.5, label=r'$\sqrt{s}$ (2)')
-	for i in range(len(A1)):
-		ax.scatter(AA1[i], BB1[i], c='C' + str(i))
-		ax.scatter(AA2[i], BB2[i], c='C' + str(i))
+	AA = [AA1[0], AA1[1], AA1[2], AA1[3], AA1[4]]
+	BB = [BB1[0], BB1[1], BB1[2], BB1[3], BB1[4]]
+	BBB = [BB2[0], BB2[1], BB2[2], BB2[3], BB2[4]]
+	ax.plot(AA1, BB1, '--', markersize=15, linewidth=0.5, label=r'Free IOV')
+	#ax.plot(AA2, BB2, '--', markersize=15, linewidth=0.5, label=r'In-medium IOV')
+	for i in range(len(AA1)):
+		ax.scatter(AA1[i], BB1[i], color='C'+str(i))
+		#ax.scatter(AA2[i], BB2[i], color='C'+str(i))
 	ax.set_xlabel(r"$A^{2/3}$")
-	ax.set_ylabel(r"$B_{K^-}$ (MeV)")
-	ax.set_xlim(0,40)
-	ax.set_ylim(0,40)
+	ax.set_ylabel(r"$B_{\eta}$ (MeV)")
+	#ax.set_xlim(0,40)
+	ax.set_ylim(-2,5)
 	ax.tick_params(which='both',direction='in',top=True,right=True)
-	ax.legend(frameon=False)
+	ax.legend(loc=4, frameon=False)
+	#plt.text(AA1[0]+xstep, BB1[0]+ystep, r'B')
 	plt.text(AA1[0]+xstep, BB1[0]+ystep, r'C')
-	plt.text(AA1[1]+xstep-1.5, BB1[1]+ystep, r'Mg')
+	#plt.text(AA1[2]+xstep, BB1[2]+ystep, r'O')
+	plt.text(AA1[1]+xstep-1, BB1[1]+ystep, r'Mg')
+	#plt.text(AA1[4]+xstep, BB1[4]+ystep, r'Si')
 	plt.text(AA1[2]+xstep, BB1[2]+ystep, r'S')
 	plt.text(AA1[3]+xstep, BB1[3]+ystep, r'Ca')
-	plt.text(AA1[4]+xstep, BB1[4]-ystep-1.9, r'Pb')
+	plt.text(AA1[4]+xstep, BB1[4]-ystep, r'Pb')
 	plt.locator_params(axis='x', nbins=10)
 	plt.locator_params(axis='y', nbins=10)
 	plt.tight_layout()
@@ -113,22 +121,27 @@ def main():
 	
 	fig2 = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax2 = fig2.add_subplot(111)
-	ax2.plot(AA1, GG1, '--', markersize=15, linewidth=0.5, label=r'$\sqrt{s}$ (1)')
-	ax2.plot(AA2, GG2, '--', markersize=15, linewidth=0.5, label=r'$\sqrt{s}$ (2)')
+	GG = [GG1[0], GG1[1], GG1[2], GG1[3], GG1[4]]
+	GGG = [GG2[0], GG2[1], GG2[2], GG2[3], GG2[4]]
+	ax2.plot(AA1, GG1, '--', markersize=15, linewidth=0.5, label=r'Free IOV')
+	#ax2.plot(AA1, GG2, '--', markersize=15, linewidth=0.5, label=r'In-medium IOV')
 	for i in range(len(A1)):
-		ax2.scatter(AA1[i], GG1[i], c='C' + str(i))
-		ax2.scatter(AA2[i], GG2[i], c='C' + str(i))
+		ax2.scatter(AA1[i], GG1[i], color='C'+str(i))
+		#ax2.scatter(AA2[i], GG2[i], color='C'+str(i))
 	ax2.set_xlabel(r"$A^{2/3}$")
-	ax2.set_ylabel(r"$\Gamma_{K^-}$ (MeV)")
-	ax2.set_xlim(0,40)
-	ax2.set_ylim(60,90)
+	ax2.set_ylabel(r"$\Gamma_{\eta}$ (MeV)")
+	#ax2.set_xlim(0,40)
+	#ax2.set_ylim(0,15)
 	ax2.tick_params(which='both',direction='in',top=True,right=True)
 	ax2.legend(frameon=False)
-	plt.text(AA1[0]+xstep, GG2[0]+ystep, r'C')
-	plt.text(AA1[1]+xstep-1.0, GG1[1]+ystep+2.0, r'Mg')
+	#plt.text(AA1[0]+xstep, GG1[0]+ystep, r'B')
+	plt.text(AA1[0]+xstep, GG1[0]+ystep, r'C')
+	#plt.text(AA1[2]+xstep, GG2[2]+ystep, r'O')
+	plt.text(AA1[1]+xstep-0.5, GG1[1]+ystep, r'Mg')
+	#plt.text(AA1[4]+xstep, GG2[4]+ystep, r'Si')
 	plt.text(AA1[2]+xstep, GG1[2]+ystep, r'S')
 	plt.text(AA1[3]+xstep, GG1[3]+ystep, r'Ca')
-	plt.text(AA1[4]+xstep, GG1[4]+ystep, r'Pb')
+	plt.text(AA1[4]+xstep, GG1[4]-ystep, r'Pb')
 	plt.locator_params(axis='x', nbins=10)
 	plt.locator_params(axis='y', nbins=10)
 	plt.tight_layout()

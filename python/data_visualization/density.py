@@ -50,7 +50,7 @@ def main():
 
 	datafile1 = "../../inp/nuclei/input.inp"
 	x1, x2, x3, x4, x5, x6 = reading(datafile1, 6)
-	nuc = 6
+	nuc = 5
 	Z = x1[nuc]
 	A = x2[nuc]
 	Rn = x3[nuc]
@@ -145,35 +145,36 @@ def main():
 
 	fig = plt.figure(facecolor='w',figsize=(5.5,4.5))
 	ax = fig.add_subplot(111)
-	ax.plot(xx,RVopt(xx),label=r"$V_{\mathrm{opt}}^{(1)}$")
-	ax.plot(xx,RDDVopt(xx),label=r"$V_{\mathrm{opt}}^{(2)}$")
-	ax.plot(r,VReal*mu/hmass,label=r"$V_{\mathrm{opt}}^{(3)}$")
-	ax.plot(xx,Vc(xx),label=r"$V_{\mathrm{C}}$")
+	ax.plot(xx,Density(xx),label=r"$\rho(r)$")
+	ax.plot(xx,0.35*np.exp(-0.5*(xx-7)**2)*np.exp(-xx*0.1),label=r"3d-atom")
+	#ax.plot(r,VReal*mu/hmass,label=r"$V_{\mathrm{opt}}^{(3)}$")
+	#ax.plot(xx,Vc(xx),label=r"$V_{\mathrm{C}}$")
 	ax.set_xlabel(r"$r$ (fm)")
-	ax.set_ylabel(r"Re[$V_{\mathrm{opt}}$] (MeV)")
-	ax.set_xlim(0,8)
-	ax.set_ylim(-220,10)
+	ax.set_ylabel(r"$|u_{n \ell}|^2 (\textrm{fm}^{-1})$")
+	ax.set_xlim(0,10)
+	#ax.set_ylim(-220,10)
 	ax.tick_params(which='both',direction='in',top=True,right=True)
-	ax.legend(loc=4, prop={'size': 15}, frameon=False, handletextpad=0.1, markerfirst=False)
+	ax.legend(loc=3, prop={'size': 15}, frameon=False, handletextpad=0.1, markerfirst=False)
+	plt.text(8, 0.175, r'${}^{32}\textrm{S}$')
 	plt.locator_params(axis='x', nbins=10)
 	plt.locator_params(axis='y', nbins=10)
 	plt.tight_layout()
 	
     
-	fig2 = plt.figure(facecolor='w',figsize=(5.5,4.5))
-	ax2 = fig2.add_subplot(111)
-	ax2.plot(xx,IVopt(xx),label=r"$V_{\mathrm{opt}}^{(1)}$")
-	ax2.plot(xx,IDDVopt(xx),label=r"$V_{\mathrm{opt}}^{(2)}$")
-	ax2.plot(r,VImag*mu/hmass,label=r"$V_{\mathrm{opt}}^{(3)}$")
-	ax2.set_xlabel(r"$r$ (fm)")
-	ax2.set_ylabel(r"Im[$V_{\mathrm{opt}}$] (MeV)")
-	ax2.set_xlim(0,8)
-	ax2.set_ylim(-220,10)
-	ax2.tick_params(which='both',direction='in',top=True,right=True)
-	plt.locator_params(axis='x', nbins=10)
-	plt.locator_params(axis='y', nbins=10)
-	ax2.legend(loc=4, prop={'size': 15}, frameon=False, markerfirst=False)
-	plt.tight_layout()
+#	fig2 = plt.figure(facecolor='w',figsize=(5.5,4.5))
+#	ax2 = fig2.add_subplot(111)
+#	ax2.plot(xx,IVopt(xx),label=r"$V_{\mathrm{opt}}^{(1)}$")
+#	ax2.plot(xx,IDDVopt(xx),label=r"$V_{\mathrm{opt}}^{(2)}$")
+#	ax2.plot(r,VImag*mu/hmass,label=r"$V_{\mathrm{opt}}^{(3)}$")
+#	ax2.set_xlabel(r"$r$ (fm)")
+#	ax2.set_ylabel(r"Im[$V_{\mathrm{opt}}$] (MeV)")
+#	ax2.set_xlim(0,8)
+#	ax2.set_ylim(-220,10)
+#	ax2.tick_params(which='both',direction='in',top=True,right=True)
+#	plt.locator_params(axis='x', nbins=10)
+#	plt.locator_params(axis='y', nbins=10)
+#	ax2.legend(loc=4, prop={'size': 15}, frameon=False, markerfirst=False)
+#	plt.tight_layout()
 	
     
 	plt.show()

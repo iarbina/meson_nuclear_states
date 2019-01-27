@@ -1,12 +1,9 @@
-bin/*
 viz/sty/
 *pictures/
 .old
 .many
 .eta
 kk
-obj/*.o
-obj/*.mod
 .*.swm
 .*.swn
 .*.swp

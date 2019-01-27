@@ -1,6 +1,6 @@
-bin/*
-obj/*.o
-obj/*.mod
+*.exe
+*.o
+*.mod
 viz/sty/
 *pictures/
 .old

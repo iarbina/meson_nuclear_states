@@ -1,4 +1,11 @@
+sty/
+pictures/
+.old
+.many
+.eta
 kk
+*.o
+*.mod
 .*.swm
 .*.swn
 .*.swp
